@@ -61,7 +61,8 @@ public class SeataAutoDataSourceProxyCreator extends AbstractAutoProxyCreator {
     protected Object[] getAdvicesAndAdvisorsForBean(Class<?> beanClass, String beanName, TargetSource customTargetSource) {
         return advisors;
     }
-
+    // 这个方法里面确定对那些Bean不起作用
+    // 非DataSource的都会不起作用
     @Override
     protected boolean shouldSkip(Class<?> beanClass, String beanName) {
         if (excludes.contains(beanClass.getName())) {
@@ -87,6 +88,7 @@ public class SeataAutoDataSourceProxyCreator extends AbstractAutoProxyCreator {
             // else, build proxy,  put <origin, proxy> to holder and return enhancer
             DataSource origin = (DataSource) bean;
             SeataDataSourceProxy proxy = buildProxy(origin, dataSourceProxyMode);
+            //存入代理
             DataSourceProxyHolder.put(origin, proxy);
             return enhancer;
         }

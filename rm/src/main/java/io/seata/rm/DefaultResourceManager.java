@@ -34,6 +34,7 @@ import io.seata.core.model.ResourceManager;
  *
  * @author zhangsen
  */
+//DefaultResourceManager是虚拟的ResourceManager，适配所有的ResourceManager，所有方法调用都委派给对应负责的ResourceManager处理。
 public class DefaultResourceManager implements ResourceManager {
 
     /**
@@ -86,6 +87,8 @@ public class DefaultResourceManager implements ResourceManager {
     public BranchStatus branchRollback(BranchType branchType, String xid, long branchId,
                                        String resourceId, String applicationData)
         throws TransactionException {
+        //首先根据resource的branchType选择一个ResourceManager.
+        //resource是DataSourceProxy,它的branchType是BranchType.AT，BranchType.AT对应的ResourceManager是DataSourceManager。
         return getResourceManager(branchType).branchRollback(branchType, xid, branchId, resourceId, applicationData);
     }
 

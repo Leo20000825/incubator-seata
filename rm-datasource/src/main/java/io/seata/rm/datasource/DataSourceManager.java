@@ -58,6 +58,7 @@ public class DataSourceManager extends AbstractResourceManager {
         request.setLockKey(lockKeys);
         request.setResourceId(resourceId);
         try {
+            //在全局事务上下文中，或当需要全局锁时，发送一个同步请求以查询资源的锁定状态。
             GlobalLockQueryResponse response;
             if (RootContext.inGlobalTransaction() || RootContext.requireGlobalLock()) {
                 response = (GlobalLockQueryResponse) RmNettyRemotingClient.getInstance().sendSyncRequest(request);
@@ -86,7 +87,9 @@ public class DataSourceManager extends AbstractResourceManager {
     @Override
     public void registerResource(Resource resource) {
         DataSourceProxy dataSourceProxy = (DataSourceProxy) resource;
+        //资源存入缓存
         dataSourceCache.put(dataSourceProxy.getResourceId(), dataSourceProxy);
+        //远程调用告知TC进行注册
         super.registerResource(dataSourceProxy);
     }
 
@@ -108,6 +111,8 @@ public class DataSourceManager extends AbstractResourceManager {
     @Override
     public BranchStatus branchCommit(BranchType branchType, String xid, long branchId, String resourceId,
                                      String applicationData) throws TransactionException {
+
+        // 异步处理器，提供异步删除undo日志的方法（分支提交）----------返回提交成功，异步去删除undo_log日志
         return asyncWorker.branchCommit(xid, branchId, resourceId);
     }
 
@@ -119,6 +124,7 @@ public class DataSourceManager extends AbstractResourceManager {
             throw new ShouldNeverHappenException(String.format("resource: %s not found",resourceId));
         }
         try {
+            //委派给undologManager做分支事务回滚
             UndoLogManagerFactory.getUndoLogManager(dataSourceProxy.getDbType()).undo(dataSourceProxy, xid, branchId);
         } catch (TransactionException te) {
             StackTraceLogger.info(LOGGER, te,

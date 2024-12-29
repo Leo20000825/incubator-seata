@@ -126,6 +126,7 @@ public final class TmNettyRemotingClient extends AbstractNettyRemotingClient {
      * @return the instance
      */
     public static TmNettyRemotingClient getInstance() {
+        //双重检查
         if (instance == null) {
             synchronized (TmNettyRemotingClient.class) {
                 if (instance == null) {

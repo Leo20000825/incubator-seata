@@ -39,6 +39,8 @@ import java.util.concurrent.TimeoutException;
  *
  * @author zhangsen
  */
+// 创建BranchRegisterRequest请求，通过RmRpcClient客户端使用netty进行rpc调用，请求至TC，返回唯一的分支Id数据，
+// 超时或报错抛出TransactionException
 public abstract class AbstractResourceManager implements ResourceManager {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(AbstractResourceManager.class);
@@ -56,6 +58,9 @@ public abstract class AbstractResourceManager implements ResourceManager {
      */
     @Override
     public Long branchRegister(BranchType branchType, String resourceId, String clientId, String xid, String applicationData, String lockKeys) throws TransactionException {
+        //请求至TC
+        // 创建BranchRegisterRequest请求，通过RmRpcClient客户端使用netty进行rpc调用，请求至TC，返回唯一的分支Id数据，
+        // 超时或报错抛出TransactionException
         try {
             BranchRegisterRequest request = new BranchRegisterRequest();
             request.setXid(xid);
@@ -68,6 +73,7 @@ public abstract class AbstractResourceManager implements ResourceManager {
             if (response.getResultCode() == ResultCode.Failed) {
                 throw new RmTransactionException(response.getTransactionExceptionCode(), String.format("Response[ %s ]", response.getMsg()));
             }
+            //返回唯一的分支Id数据
             return response.getBranchId();
         } catch (TimeoutException toe) {
             throw new RmTransactionException(TransactionExceptionCode.IO, "RPC Timeout", toe);
@@ -77,7 +83,7 @@ public abstract class AbstractResourceManager implements ResourceManager {
     }
 
     /**
-     * report branch status
+     * report branch status向TC
      *
      * @param branchType      the branch type
      * @param xid             the xid
@@ -117,7 +123,7 @@ public abstract class AbstractResourceManager implements ResourceManager {
     }
 
     @Override
-    public void registerResource(Resource resource) {
+    public void  registerResource (Resource resource) {
         RmNettyRemotingClient.getInstance().registerResource(resource.getResourceGroupId(), resource.getResourceId());
     }
 }

@@ -22,10 +22,11 @@ import io.seata.core.exception.TransactionException;
  *
  * @author sharajava
  */
+//接出
 public interface ResourceManagerOutbound {
 
     /**
-     * Branch register long.
+     * Branch register long. 向tc注册
      *
      * @param branchType the branch type
      * @param resourceId the resource id
@@ -36,11 +37,12 @@ public interface ResourceManagerOutbound {
      * @return the long
      * @throws TransactionException the transaction exception
      */
+    //请求注册分支事务
     Long branchRegister(BranchType branchType, String resourceId, String clientId, String xid, String applicationData, String lockKeys) throws
         TransactionException;
 
     /**
-     * Branch report.
+     * Branch report. 向tc报告状态
      *
      * @param branchType      the branch type
      * @param xid             the xid
@@ -49,10 +51,11 @@ public interface ResourceManagerOutbound {
      * @param applicationData the application data
      * @throws TransactionException the transaction exception
      */
+    //分支事务状态报告
     void branchReport(BranchType branchType, String xid, long branchId, BranchStatus status, String applicationData) throws TransactionException;
 
     /**
-     * Lock query boolean.
+     * Lock query boolean. 检查某个资源是否已被锁定，从而决定是否可以进行下一步操作。
      *
      * @param branchType the branch type
      * @param resourceId the resource id
@@ -61,6 +64,7 @@ public interface ResourceManagerOutbound {
      * @return the boolean
      * @throws TransactionException the transaction exception
      */
+    //锁住Query
     boolean lockQuery(BranchType branchType, String resourceId, String xid, String lockKeys)
         throws TransactionException;
 }

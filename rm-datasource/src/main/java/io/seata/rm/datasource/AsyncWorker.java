@@ -80,6 +80,7 @@ public class AsyncWorker {
 
     public BranchStatus branchCommit(String xid, long branchId, String resourceId) {
         Phase2Context context = new Phase2Context(xid, branchId, resourceId);
+        //存入commitQueue
         addToCommitQueue(context);
         return BranchStatus.PhaseTwo_Committed;
     }
@@ -167,17 +168,17 @@ public class AsyncWorker {
         } finally {
             IOUtil.close(conn);
         }
-
     }
 
     private void deleteUndoLog(final Connection conn, UndoLogManager undoLogManager, List<Phase2Context> contexts) {
+        //剔除重复的xid和branchid
         Set<String> xids = new LinkedHashSet<>(contexts.size());
         Set<Long> branchIds = new LinkedHashSet<>(contexts.size());
         contexts.forEach(context -> {
             xids.add(context.xid);
             branchIds.add(context.branchId);
         });
-
+        //批量删除最大1000
         try {
             undoLogManager.batchDeleteUndoLog(xids, branchIds, conn);
             if (!conn.getAutoCommit()) {

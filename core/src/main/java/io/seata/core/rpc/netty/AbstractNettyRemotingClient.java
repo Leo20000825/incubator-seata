@@ -109,13 +109,16 @@ public abstract class AbstractNettyRemotingClient extends AbstractNettyRemoting 
 
     @Override
     public void init() {
+        //启动ScheduledExecutorService定时执行器，每10秒尝试进行一次重连TC
         timerExecutor.scheduleAtFixedRate(new Runnable() {
             @Override
+            //重连tc
             public void run() {
                 clientChannelManager.reconnect(getTransactionServiceGroup());
             }
         }, SCHEDULE_DELAY_MILLS, SCHEDULE_INTERVAL_MILLS, TimeUnit.MILLISECONDS);
         if (this.isEnableClientBatchSendRequest()) {
+            //用于多数据合并，减少通信次数
             mergeSendExecutorService = new ThreadPoolExecutor(MAX_MERGE_SEND_THREAD,
                 MAX_MERGE_SEND_THREAD,
                 KEEP_ALIVE_TIME, TimeUnit.MILLISECONDS,

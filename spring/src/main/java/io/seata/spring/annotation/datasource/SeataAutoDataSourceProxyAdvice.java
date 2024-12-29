@@ -45,6 +45,7 @@ public class SeataAutoDataSourceProxyAdvice implements MethodInterceptor, Introd
     @Override
     public Object invoke(MethodInvocation invocation) throws Throwable {
         // check whether current context is expected
+        //检查是否符合上下文环境
         if (!inExpectedContext()) {
             return invocation.proceed();
         }
@@ -58,11 +59,13 @@ public class SeataAutoDataSourceProxyAdvice implements MethodInterceptor, Introd
             declared = DataSource.class.getDeclaredMethod(name, parameterTypes);
         } catch (NoSuchMethodException e) {
             // mean this method is not declared by DataSource
+            // 仅处理datasource声明的方法
             return invocation.proceed();
         }
 
         // switch invoke instance to its proxy
         DataSource origin = (DataSource) invocation.getThis();
+        //取出代理
         SeataDataSourceProxy proxy = DataSourceProxyHolder.get(origin);
         Object[] args = invocation.getArguments();
         return declared.invoke(proxy, args);

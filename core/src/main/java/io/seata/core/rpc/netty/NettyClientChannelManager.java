@@ -168,6 +168,7 @@ class NettyClientChannelManager {
     void reconnect(String transactionServiceGroup) {
         List<String> availList = null;
         try {
+            //重连时，先从file.conf中根据分组名称(service_group)找到集群名称(cluster_name)
             availList = getAvailServerList(transactionServiceGroup);
         } catch (Exception e) {
             LOGGER.error("Failed to get available servers: {}", e.getMessage(), e);
@@ -190,6 +191,7 @@ class NettyClientChannelManager {
             return;
         }
         Set<String> channelAddress = new HashSet<>(availList.size());
+        //再根据集群名称找到fescar-server集群ip端口列表
         try {
             for (String serverAddress : availList) {
                 try {
