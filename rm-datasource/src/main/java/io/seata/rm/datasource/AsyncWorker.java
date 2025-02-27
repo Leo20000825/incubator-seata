@@ -66,7 +66,7 @@ public class AsyncWorker {
     private final BlockingQueue<Phase2Context> commitQueue;
 
     private final ScheduledExecutorService scheduledExecutor;
-
+    //实例化异步处理器，提供异步删除undo日志的方法
     public AsyncWorker(DataSourceManager dataSourceManager) {
         this.dataSourceManager = dataSourceManager;
 
@@ -160,6 +160,7 @@ public class AsyncWorker {
             // split contexts into several lists, with each list contain no more element than limit size
             List<List<Phase2Context>> splitByLimit = Lists.partition(contexts, UNDOLOG_DELETE_LIMIT_SIZE);
             for (List<Phase2Context> partition : splitByLimit) {
+                //提交真正对应的操作是deleteUndoLog
                 deleteUndoLog(conn, undoLogManager, partition);
             }
         } catch (SQLException sqlExx) {

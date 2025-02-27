@@ -39,7 +39,7 @@ public interface ResourceManagerInbound {
      * @throws TransactionException Any exception that fails this will be wrapped with TransactionException and thrown
      *                              out.
      */
-    //TC 调用 RM 提交分支事务
+    //TM 通知 RM 提交分支事务
     BranchStatus branchCommit(BranchType branchType, String xid, long branchId, String resourceId, String applicationData) throws TransactionException;
 
     /**
@@ -54,6 +54,6 @@ public interface ResourceManagerInbound {
      * @throws TransactionException Any exception that fails this will be wrapped with TransactionException and thrown
      *                              out.
      */
-    //TC 调用 RM 回滚分支事务
+    //TM 调用 RM 回滚分支事务
     BranchStatus branchRollback(BranchType branchType, String xid, long branchId, String resourceId, String applicationData) throws TransactionException;
 }

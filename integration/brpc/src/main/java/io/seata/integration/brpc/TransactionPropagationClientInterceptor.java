@@ -38,7 +38,6 @@ public class TransactionPropagationClientInterceptor extends AbstractInterceptor
 
     @Override
     public void aroundProcess(Request brpcRequest, Response brpcResponse, InterceptorChain chain) throws Exception {
-
         String xid = RootContext.getXID();
         String rpcXid = getRpcXid();
         Map<String, Object> kvAttachment = brpcRequest.getKvAttachment();
@@ -50,6 +49,7 @@ public class TransactionPropagationClientInterceptor extends AbstractInterceptor
             if (null == kvAttachment) {
                 kvAttachment = new HashMap<>();
             }
+            //设置xid和事务类型
             kvAttachment.put(RootContext.KEY_XID, xid);
             if (null != RootContext.getBranchType()) {
                 kvAttachment.put(RootContext.KEY_BRANCH_TYPE, RootContext.getBranchType().name());

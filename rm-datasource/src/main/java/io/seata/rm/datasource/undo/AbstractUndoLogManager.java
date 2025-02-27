@@ -222,13 +222,14 @@ public abstract class AbstractUndoLogManager implements UndoLogManager {
 
         String xid = connectionContext.getXid();
         long branchId = connectionContext.getBranchId();
-
+        //生成undolog
         BranchUndoLog branchUndoLog = new BranchUndoLog();
         branchUndoLog.setXid(xid);
         branchUndoLog.setBranchId(branchId);
         branchUndoLog.setSqlUndoLogs(connectionContext.getUndoItems());
 
         UndoLogParser parser = UndoLogParserFactory.getInstance();
+        //字节
         byte[] undoLogContent = parser.encode(branchUndoLog);
 
         if (LOGGER.isDebugEnabled()) {
@@ -240,7 +241,7 @@ public abstract class AbstractUndoLogManager implements UndoLogManager {
             compressorType = ROLLBACK_INFO_COMPRESS_TYPE;
             undoLogContent = CompressorFactory.getCompressor(compressorType.getCode()).compress(undoLogContent);
         }
-
+        //插入undo_log
         insertUndoLogWithNormal(xid, branchId, buildContext(parser.getName(), compressorType), undoLogContent, cp.getTargetConnection());
     }
 
@@ -268,7 +269,7 @@ public abstract class AbstractUndoLogManager implements UndoLogManager {
                     conn.setAutoCommit(false);
                 }
 
-                // Find UNDO LOG
+                // Find UNDO LOG ,根据branchId 和 xid
                 selectPST = conn.prepareStatement(SELECT_UNDO_LOG_SQL);
                 selectPST.setLong(1, branchId);
                 selectPST.setString(2, xid);
@@ -321,6 +322,7 @@ public abstract class AbstractUndoLogManager implements UndoLogManager {
 
                 // If undo_log exists, it means that the branch transaction has completed the first phase,
                 // we can directly roll back and clean the undo_log
+
                 // Otherwise, it indicates that there is an exception in the branch transaction,
                 // causing undo_log not to be written to the database.
                 // For example, the business processing timeout, the global transaction is the initiator rolls back.

@@ -56,10 +56,12 @@ public final class ConfigurationFactory {
         if (seataConfigName == null) {
             seataConfigName = REGISTRY_CONF_DEFAULT;
         }
+        //优先判断环境变量
         String envValue = System.getProperty(ENV_PROPERTY_KEY);
         if (envValue == null) {
             envValue = System.getenv(ENV_SYSTEM_KEY);
         }
+        //默认使用FileConfiguration且不开启动态刷新
         Configuration configuration = (envValue == null) ? new FileConfiguration(seataConfigName,
                 false) : new FileConfiguration(seataConfigName + "-" + envValue, false);
         Configuration extConfiguration = null;

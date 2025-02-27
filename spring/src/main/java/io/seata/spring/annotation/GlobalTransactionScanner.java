@@ -268,19 +268,25 @@ public class GlobalTransactionScanner extends AbstractAutoProxyCreator
     @Override
     protected Object wrapIfNecessary(Object bean, String beanName, Object cacheKey) {
         // do checkers
+        //排除配置的不做增强的bean
         if (!doCheckers(bean, beanName)) {
             return bean;
         }
 
         try {
+            //锁住代理集合
             synchronized (PROXYED_SET) {
+                //如果存在则返回
                 if (PROXYED_SET.contains(beanName)) {
                     return bean;
                 }
                 interceptor = null;
                 //check TCC proxy
+                //检查是否属于 tcc proxy
+                //sofa:reference/dubbo:reference/本地TCC
                 if (TCCBeanParserUtils.isTccAutoProxy(bean, beanName, applicationContext)) {
                     // init tcc fence clean task if enable useTccFence
+                    // 初始化 tcc 栅栏同时 清楚task
                     TCCBeanParserUtils.initTccFenceCleanTask(TCCBeanParserUtils.getRemotingDesc(beanName), applicationContext);
                     //TCC interceptor, proxy bean of sofa:reference/dubbo:reference, and LocalTCC
                     interceptor = new TccActionInterceptor(TCCBeanParserUtils.getRemotingDesc(beanName));
@@ -305,6 +311,7 @@ public class GlobalTransactionScanner extends AbstractAutoProxyCreator
                 }
 
                 LOGGER.info("Bean[{}] with name [{}] would use interceptor [{}]", bean.getClass().getName(), beanName, interceptor.getClass().getName());
+                //不是代理类则走Spring的默认wrap，是代理则用上面配置的interceptor代理
                 if (!AopUtils.isAopProxy(bean)) {
                     bean = super.wrapIfNecessary(bean, beanName, cacheKey);
                 } else {
@@ -523,6 +530,7 @@ public class GlobalTransactionScanner extends AbstractAutoProxyCreator
 
     @Override
     public void onChangeEvent(ConfigurationChangeEvent event) {
+        //只感应该项配置
         if (ConfigurationKeys.DISABLE_GLOBAL_TRANSACTION.equals(event.getDataId())) {
             disableGlobalTransaction = Boolean.parseBoolean(event.getNewValue().trim());
             if (!disableGlobalTransaction && initialized.compareAndSet(false, true)) {

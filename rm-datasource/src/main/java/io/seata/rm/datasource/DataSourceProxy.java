@@ -113,6 +113,7 @@ public class DataSourceProxy extends AbstractDataSourceProxy implements Resource
             throw new IllegalStateException("can not init dataSource", e);
         }
         initResourceId();
+        //DefaultResourceManager的registerResource方法，首先根据resource的branchType选择一个ResourceManager.
         DefaultResourceManager.get().registerResource(this);
         if (ENABLE_TABLE_META_CHECKER_ENABLE) {
             tableMetaExecutor.scheduleAtFixedRate(() -> {

@@ -89,6 +89,13 @@ public class DefaultGlobalTransaction implements GlobalTransaction {
 
     @Override
     public void begin(int timeout, String name) throws TransactionException {
+        //此处的角色判断有关键的作用
+        //表明当前是——全局事务的发起者（Launcher）  还是参与者（Participant）
+        //如果在分布式事务的下游系统方法中也加上GlobalTransactional注解
+        //那么它的角色就是Participant，即会忽略后面的begin就退出了
+        //而判断是发起者（Launcher）还是参与者（Participant）是根据当前上下文是否已存在XID来判断
+        //- 没有XID的就是Launcher
+        //- 已经存在XID的就是Participant
         if (role != GlobalTransactionRole.Launcher) {
             assertXIDNotNull();
             if (LOGGER.isDebugEnabled()) {
@@ -102,6 +109,7 @@ public class DefaultGlobalTransaction implements GlobalTransaction {
             throw new IllegalStateException("Global transaction already exists," +
                 " can't begin a new global transaction, currentXid = " + currentXid);
         }
+        //调用transactionManager
         xid = transactionManager.begin(null, null, name, timeout);
         status = GlobalStatus.Begin;
         RootContext.bind(xid);

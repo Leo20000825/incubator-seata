@@ -46,6 +46,7 @@ public class TCCBeanParserUtils {
      * @param applicationContext the application context
      * @return boolean boolean
      */
+    //TCC代理的Bean有 sofa:reference/dubbo:reference/本地TCC
     public static boolean isTccAutoProxy(Object bean, String beanName, ApplicationContext applicationContext) {
         boolean isRemotingBean = parserRemotingServiceInfo(bean, beanName);
         //get RemotingBean description

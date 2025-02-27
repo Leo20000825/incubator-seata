@@ -103,9 +103,11 @@ public class ConfigurationCache implements ConfigurationChangeListener {
     public Configuration proxy(Configuration originalConfiguration) {
         return (Configuration)Enhancer.create(Configuration.class,
             (MethodInterceptor)(proxy, method, args, methodProxy) -> {
+            //经过此代理增强的Configuration会对getXX方法做拦截增强
                 if (method.getName().startsWith(METHOD_PREFIX)
                         && !method.getName().equalsIgnoreCase(METHOD_LATEST_CONFIG)) {
                     String rawDataId = (String)args[0];
+                    //先从缓存中获取
                     ObjectWrapper wrapper = CONFIG_CACHE.get(rawDataId);
                     ObjectWrapper.ConfigType type = ObjectWrapper.getTypeByName(method.getName().substring(METHOD_PREFIX.length()));
                     Object defaultValue = null;

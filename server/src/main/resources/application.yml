@@ -1,6 +1,8 @@
 server:
   port: 7091
-
+service:
+  vgroupMapping:
+    default_tx_group: default
 spring:
   application:
     name: seata-server
@@ -8,13 +10,7 @@ spring:
 logging:
   config: classpath:logback-spring.xml
   file:
-    path: ${user.home}/logs/seata
-  extend:
-    logstash-appender:
-      destination: 127.0.0.1:4560
-    kafka-appender:
-      bootstrap-servers: 127.0.0.1:9092
-      topic: logback_to_logstash
+    path: ${log.home:${user.home}/logs/seata}
 
 console:
   user:
@@ -23,18 +19,88 @@ console:
 
 seata:
   config:
-    # support: nacos, consul, apollo, zk, etcd3
     type: file
+    nacos:
+      server-addr: 127.0.0.1:8848
+      namespace: 95d375c2-848a-4fdd-bcdf-2f1ce2989ca1
+      username: nacos
+      password: nacos
+      #context-path:
+      group: SEATA_GROUP
+      data-id: seataServer.properties
+
   registry:
-    # support: nacos, eureka, redis, zk, consul, etcd3, sofa
-    type: file
+    type: nacos
+    nacos:
+      application: seata-server
+      server-addr: 127.0.0.1:8848
+      group: SEATA_GROUP
+      namespace: 95d375c2-848a-4fdd-bcdf-2f1ce2989ca1
+      cluster: "default"
+      username: nacos
+      password: nacos
+      #context-path:
   store:
     # support: file 、 db 、 redis
-    mode: file
-#  server:
-#    service-port: 8091 #If not configured, the default is '${server.port} + 1000'
+    mode: db
+    session:
+      mode: db
+    lock:
+      mode: db
+    file:
+      dir: sessionStore
+      max-branch-session-size: 16384
+      max-global-session-size: 512
+      file-write-buffer-cache-size: 16384
+      session-reload-read-size: 100
+      flush-disk-mode: async
+    db:
+      datasource: druid
+      db-type: mysql
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://localhost:3306/seata?useUnicode=true&characterEncoding=utf-8&useSSL=false&rewriteBatchedStatements=true
+      user: root
+      password: root
+      min-conn: 5
+      max-conn: 100
+      global-table: global_table
+      branch-table: branch_table
+      lock-table: lock_table
+      distributed-lock-table: distributed_lock
+      query-limit: 100
+      max-wait: 5000
+    redis:
+      mode: single
+      database: 0
+      min-conn: 1
+      max-conn: 10
+      password:
+      max-total: 100
+      query-limit: 100
+      single:
+        host: 127.0.0.1
+        port: 6379
+      sentinel:
+        master-name:
+        sentinel-hosts:
+  metrics:
+    enabled: false
+    registry-type: compact
+    exporter-list: prometheus
+    exporter-prometheus-port: 9898
+  transport:
+    rpc-tc-request-timeout: 30000
+    enable-tc-server-batch-send-response: false
+    shutdown:
+      wait: 3
+    thread-factory:
+      boss-thread-prefix: NettyBoss
+      worker-thread-prefix: NettyServerNIOWorker
+      boss-thread-size: 1
+  #  server:
+  #    service-port: 8091 #If not configured, the default is '${server.port} + 1000'
   security:
     secretKey: SeataSecretKey0c382ef121d778043159209298fd40bf3850a017
     tokenValidityInMilliseconds: 1800000
     ignore:
-      urls: /,/**/*.css,/**/*.js,/**/*.html,/**/*.map,/**/*.svg,/**/*.png,/**/*.ico,/console-fe/public/**,/api/v1/auth/login
+      urls: /, /**/*.css, /**/*.js, /**/*.html, /**/*.map, /**/*.svg, /**/*.png, /**/*.jpeg, /**/*.ico, /api/v1/auth/login

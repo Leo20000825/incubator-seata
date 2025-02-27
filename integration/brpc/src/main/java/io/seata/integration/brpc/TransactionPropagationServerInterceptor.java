@@ -32,19 +32,22 @@ import java.util.Map;
  *
  * @author mxz0828@163.com
  */
+//服务端
 public class TransactionPropagationServerInterceptor extends AbstractInterceptor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TransactionPropagationServerInterceptor.class);
 
     @Override
     public boolean handleRequest(Request request) {
-
+        //每个RM收到请求后，对xid进行替换，代表加入全局事务一阶段，执行完后清除
         String branchType = getRpcBranchType(request);
         String xid = RootContext.getXID();
         String rpcXid = getRpcXid(request);
         if (null == xid) {
             if (null != rpcXid) {
+                //绑定xid和事务类型
                 RootContext.bind(rpcXid);
+                //例如at，因为服务端TC可能还参与别的事务意味着xid和事务类型可能不同
                 RootContext.bindBranchType(BranchType.valueOf(branchType));
                 if (LOGGER.isInfoEnabled()) {
                     LOGGER.info("SEATA-BRPC[{}], bind [{}] to RootContext", branchType, rpcXid);
@@ -73,6 +76,7 @@ public class TransactionPropagationServerInterceptor extends AbstractInterceptor
                         LOGGER.warn("SEATA-BRPC[{}]: xid in change during RPC from [{}] to [{}]", branchType, rpcXid, unbindXid);
                     }
                     if (unbindXid != null) {
+                        //换回原来的xid
                         RootContext.bind(unbindXid);
                         if (LOGGER.isWarnEnabled()) {
                             LOGGER.warn("SEATA-BRPC[{}]: bind [{}] back to RootContext", branchType, unbindXid);
@@ -84,7 +88,6 @@ public class TransactionPropagationServerInterceptor extends AbstractInterceptor
     }
 
     private String getRpcXid(Request brpcRequest) {
-
         Map<String, Object> kvAttachment = brpcRequest.getKvAttachment();
         if (null == kvAttachment) {
             return null;

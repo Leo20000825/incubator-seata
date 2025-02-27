@@ -89,7 +89,7 @@ public class DataSourceManager extends AbstractResourceManager {
         DataSourceProxy dataSourceProxy = (DataSourceProxy) resource;
         //资源存入缓存
         dataSourceCache.put(dataSourceProxy.getResourceId(), dataSourceProxy);
-        //远程调用告知TC进行注册
+            //远程调用告知TC进行注册
         super.registerResource(dataSourceProxy);
     }
 

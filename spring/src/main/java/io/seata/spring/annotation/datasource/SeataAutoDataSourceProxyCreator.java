@@ -35,6 +35,10 @@ import org.springframework.aop.support.DefaultIntroductionAdvisor;
  * @author xingfudeshi@gmail.com
  * @author selfishlover
  */
+/*
+AbstractAutoProxyCreator是aop里面一个把目标对象转换成代理对象的一个后置处理器。
+在spring中，只要把后置处理器的bean定义给到ioc容器，BeanFactory就调用后置处理器的各种方法参与到bean的生命周期的各个步骤中。
+ */
 public class SeataAutoDataSourceProxyCreator extends AbstractAutoProxyCreator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SeataAutoDataSourceProxyCreator.class);

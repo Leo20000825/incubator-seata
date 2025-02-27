@@ -57,12 +57,14 @@ public class TransactionalTemplate {
         GlobalTransaction tx = GlobalTransactionContext.getCurrent();
 
         // 1.2 Handle the transaction propagation.
+        //隔离级别
         Propagation propagation = txInfo.getPropagation();
         SuspendedResourcesHolder suspendedResourcesHolder = null;
         try {
             switch (propagation) {
                 case NOT_SUPPORTED:
                     // If transaction is existing, suspend it.
+                    //如果事务已经存在则挂起
                     if (existingTransaction(tx)) {
                         suspendedResourcesHolder = tx.suspend();
                     }
@@ -70,6 +72,7 @@ public class TransactionalTemplate {
                     return business.execute();
                 case REQUIRES_NEW:
                     // If transaction is existing, suspend it, and then begin new transaction.
+                    //如果事务已经存在则挂起，然后开启一个新事务
                     if (existingTransaction(tx)) {
                         suspendedResourcesHolder = tx.suspend();
                         tx = GlobalTransactionContext.createNew();
@@ -77,6 +80,7 @@ public class TransactionalTemplate {
                     // Continue and execute with new transaction
                     break;
                 case SUPPORTS:
+                    //存在事务则使用，不存在则不使用
                     // If transaction is not existing, execute without transaction.
                     if (notExistingTransaction(tx)) {
                         return business.execute();
@@ -84,10 +88,12 @@ public class TransactionalTemplate {
                     // Continue and execute with new transaction
                     break;
                 case REQUIRED:
+                    //存在则加入，不存在则新建
                     // If current transaction is existing, execute with current transaction,
                     // else continue and execute with new transaction.
                     break;
                 case NEVER:
+                    //有事务则抛出异常
                     // If transaction is existing, throw exception.
                     if (existingTransaction(tx)) {
                         throw new TransactionException(
@@ -98,6 +104,7 @@ public class TransactionalTemplate {
                         return business.execute();
                     }
                 case MANDATORY:
+                    //如果事务不存在则抛出异常
                     // If transaction is not existing, throw exception.
                     if (notExistingTransaction(tx)) {
                         throw new TransactionException("No existing transaction found for transaction marked with propagation 'mandatory'");

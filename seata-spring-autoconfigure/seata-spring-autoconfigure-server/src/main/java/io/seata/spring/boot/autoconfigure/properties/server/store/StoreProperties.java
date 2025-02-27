@@ -18,6 +18,8 @@ package io.seata.spring.boot.autoconfigure.properties.server.store;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
+
 import static io.seata.spring.boot.autoconfigure.StarterConstants.STORE_PREFIX;
 import static io.seata.spring.boot.autoconfigure.StarterConstants.STORE_SESSION_PREFIX;
 import static io.seata.spring.boot.autoconfigure.StarterConstants.STORE_LOCK_PREFIX;
@@ -28,6 +30,12 @@ import static io.seata.spring.boot.autoconfigure.StarterConstants.STORE_LOCK_PRE
 @Component
 @ConfigurationProperties(prefix = STORE_PREFIX)
 public class StoreProperties {
+
+    @PostConstruct
+    public void init() {
+        System.out.println("================");
+    }
+
     /**
      * file, db, redis
      */

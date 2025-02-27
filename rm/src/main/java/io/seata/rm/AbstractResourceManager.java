@@ -121,7 +121,6 @@ public abstract class AbstractResourceManager implements ResourceManager {
     public void unregisterResource(Resource resource) {
         throw new NotSupportYetException("unregister a resource");
     }
-
     @Override
     public void  registerResource (Resource resource) {
         RmNettyRemotingClient.getInstance().registerResource(resource.getResourceGroupId(), resource.getResourceId());

@@ -28,6 +28,7 @@ import io.seata.rm.datasource.exec.ExecuteTemplate;
  * @param <T> the type parameter
  * @author sharajava
  */
+//seata不止会代理数据源，还会对Connection，Statement做代理封装。对sql解析发生在StatementProxy中.
 public class StatementProxy<T extends Statement> extends AbstractStatementProxy<T> {
 
     /**

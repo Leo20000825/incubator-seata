@@ -305,6 +305,7 @@ public class FileConfiguration extends AbstractConfiguration {
                     setFailResult(configFuture);
                     return;
                 }
+                //支持文件级别动态刷新
                 try {
                     if (allowDynamicRefresh) {
                         long tempLastModified = new File(targetFilePath).lastModified();

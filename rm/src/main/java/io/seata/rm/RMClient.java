@@ -31,8 +31,12 @@ public class RMClient {
      * @param transactionServiceGroup the transaction service group
      */
     public static void init(String applicationId, String transactionServiceGroup) {
+        //初始化netty
         RmNettyRemotingClient rmNettyRemotingClient = RmNettyRemotingClient.getInstance(applicationId, transactionServiceGroup);
+        //为RmNettyRemotingClient配置对应的rm，初始使用default，由所有方法调用都委派给对应负责的ResourceManager处理
         rmNettyRemotingClient.setResourceManager(DefaultResourceManager.get());
+        //接收TC在二阶段发出的提交或者回滚请求
+        //defaultHandler 使用了spi机制
         rmNettyRemotingClient.setTransactionMessageHandler(DefaultRMHandler.get());
         rmNettyRemotingClient.init();
     }

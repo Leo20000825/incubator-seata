@@ -19,13 +19,13 @@ logging:
 seata:
   config:
     # support: nacos 、 consul 、 apollo 、 zk  、 etcd3
-    type: file
+    type: nacos
     nacos:
       server-addr: 127.0.0.1:8848
-      namespace:
+      namespace: 95d375c2-848a-4fdd-bcdf-2f1ce2989ca1
       group: SEATA_GROUP
-      username:
-      password:
+      username: nacos
+      password: nacos
       ##if use MSE Nacos with auth, mutex with username/password attribute
       #access-key: ""
       #secret-key: ""
@@ -59,10 +59,10 @@ seata:
       application: seata-server
       server-addr: 127.0.0.1:8848
       group: SEATA_GROUP
-      namespace:
+      namespace: 95d375c2-848a-4fdd-bcdf-2f1ce2989ca1
       cluster: default
-      username:
-      password:
+      username: nacos
+      password: nacos
       ##if use MSE Nacos with auth, mutex with username/password attribute
       #access-key: ""
       #secret-key: ""
@@ -135,8 +135,8 @@ seata:
       db-type: mysql
       driver-class-name: com.mysql.jdbc.Driver
       url: jdbc:mysql://127.0.0.1:3306/seata?rewriteBatchedStatements=true
-      user: mysql
-      password: mysql
+      user: root
+      password: root
       min-conn: 5
       max-conn: 100
       global-table: global_table

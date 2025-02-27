@@ -73,6 +73,7 @@ public class Server {
         SessionHolder.init(parameterParser.getSessionStoreMode());
         LockerManagerFactory.init(parameterParser.getLockStoreMode());
         DefaultCoordinator coordinator = DefaultCoordinator.getInstance(nettyRemotingServer);
+        //初始化
         coordinator.init();
         nettyRemotingServer.setHandler(coordinator);
 
